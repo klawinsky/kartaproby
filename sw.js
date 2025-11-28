@@ -1,6 +1,6 @@
 // Service Worker dla aplikacji "Elektroniczna Karta Próby Hamulca"
 
-const CACHE_VERSION = 'v1.0.5';   // podbijaj wersję przy każdej zmianie frontendu
+const CACHE_VERSION = 'v1.0.6';   // podbijaj wersję przy każdej zmianie frontendu
 const CACHE_NAME = `hamulec-${CACHE_VERSION}`;
 
 const CORE_ASSETS = [
@@ -9,7 +9,8 @@ const CORE_ASSETS = [
   './manifest.webmanifest',
   './print.css',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './offline.html' // opcjonalna strona offline
 ];
 
 // Instalacja – zapisujemy podstawowe pliki w cache
@@ -48,7 +49,9 @@ self.addEventListener('fetch', event => {
           caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
           return res;
         })
-        .catch(() => caches.match(req).then(r => r || caches.match('./index.html')))
+        .catch(() =>
+          caches.match(req).then(r => r || caches.match('./offline.html'))
+        )
     );
     return;
   }
