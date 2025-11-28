@@ -8,7 +8,6 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
   <style>
-    /* Layout: first-version simple panels */
     body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; color: #222; }
     h2 { text-align: center; margin-bottom: 20px; }
     .panel { background: #fff; padding: 15px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 6px; }
@@ -20,18 +19,19 @@
     .error { color: #b00020; font-weight: 600; }
     .success { color: #0a7a2f; font-weight: 600; }
     .inline-badge { display:inline-block; margin-top:6px; padding:4px 8px; background:#eef5ff; border:1px solid #bcd3ff; border-radius:4px; font-size:12px; color:#1152a3; }
+    .hint { font-size:12px; color:#666; margin-top:4px; }
 
     /* Modal */
     .modal { display:none; position:fixed; z-index:1000; inset:0; background:rgba(0,0,0,0.5); }
-    .modal-content { background:#fff; width:340px; max-width:90vw; margin:10% auto; padding:16px 16px 12px; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.25); }
+    .modal-content { background:#fff; width:340px; max-width:90vw; margin:10% auto; padding:16px; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.25); }
     .modal header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
     .modal h3 { margin:0; font-size:16px; }
     .modal .close { background:none; border:none; font-size:22px; line-height:1; cursor:pointer; color:#555; }
     .modal .actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
     .modal input { width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; }
 
-    /* Small print hints */
-    .hint { font-size:12px; color:#666; margin-top:4px; }
+    /* Action buttons for modals */
+    .open-modal-btn { margin-left:0; background:#005a9e; }
   </style>
 </head>
 <body>
@@ -44,6 +44,11 @@
 
   <label>Miejsce wykonania próby:
     <input id="miejsce" type="text" autocomplete="off">
+  </label>
+
+  <label>Numer pociągu (max 6 cyfr):
+    <input id="nrPociagu" type="text" inputmode="numeric" maxlength="6" pattern="\\d{1,6}" placeholder="np. 123456" autocomplete="off">
+    <div class="hint">Dozwolone tylko cyfry, maksymalnie 6 znaków.</div>
   </label>
 
   <label>Data (DD.MM.YYYY):
@@ -61,11 +66,13 @@
   <label>Próbę wykonano z:
     <select id="probaZ">
       <option value="">-- wybierz --</option>
-      <option value="Lokomotywa prowadząca">Lokomotywa prowadząca</option>
-      <option value="Inna lokomotywa">Inna lokomotywa</option>
-      <option value="Urządzenie stacjonarne">Urządzenie stacjonarne</option>
+      <option value="lok">Lokomotywa prowadząca</option>
+      <option value="inna">Inna lokomotywa</option>
+      <option value="stan">Urządzenie stacjonarne</option>
     </select>
     <span id="probaBadge" class="inline-badge" style="display:none;"></span>
+    <button id="openLokBtn" class="open-modal-btn" type="button" style="display:none;">Wpisz numer lokomotywy</button>
+    <button id="openStanBtn" class="open-modal-btn" type="button" style="display:none;">Wpisz numer stanowiska</button>
   </label>
 
   <label>Osoba wykonująca próbę:
@@ -94,7 +101,7 @@
     <input id="koniec2" type="text" autocomplete="off" placeholder="np. 51 1234-567-8">
   </label>
 
-  <!-- Ukryte pola do przechowywania wartości z modali (druk korzysta z nich) -->
+  <!-- Ukryte pola na wartości z modali -->
   <input id="lokomotywa" type="hidden">
   <input id="stanowiskoNr" type="hidden">
 </div>
@@ -169,73 +176,66 @@
 </div>
 
 <script>
+  // Train number validation: only digits, max 6
+  const nrPociaguEl = document.getElementById('nrPociagu');
+  nrPociaguEl.addEventListener('input', () => {
+    // strip non-digits and cap length
+    nrPociaguEl.value = nrPociaguEl.value.replace(/\\D/g, '').slice(0, 6);
+  });
+
   // Modal helpers
   function openModal(id) {
     const el = document.getElementById(id);
     el.style.display = "block";
-    // focus first input after opening
-    setTimeout(() => {
-      const inp = el.querySelector('input');
-      if (inp) inp.focus();
-    }, 0);
+    setTimeout(() => { const inp = el.querySelector('input'); if (inp) inp.focus(); }, 0);
   }
-  function closeModal(id) {
-    const el = document.getElementById(id);
-    el.style.display = "none";
-  }
-  // Close on backdrop click
+  function closeModal(id) { document.getElementById(id).style.display = "none"; }
   document.addEventListener('click', (e) => {
-    const modals = ['lokModal','stanModal'];
-    modals.forEach(id => {
+    ['lokModal','stanModal'].forEach(id => {
       const m = document.getElementById(id);
       if (m.style.display === 'block' && e.target === m) closeModal(id);
     });
   });
-  // Close on ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeModal('lokModal'); closeModal('stanModal');
-    }
-  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal('lokModal'); closeModal('stanModal'); }});
 
-  // Source selection -> open appropriate modal
+  // Selection -> open modal + show action buttons
   const probaZEl = document.getElementById("probaZ");
   const badgeEl = document.getElementById("probaBadge");
+  const openLokBtn = document.getElementById("openLokBtn");
+  const openStanBtn = document.getElementById("openStanBtn");
+
+  openLokBtn.addEventListener('click', () => openModal('lokModal'));
+  openStanBtn.addEventListener('click', () => openModal('stanModal'));
+
   probaZEl.addEventListener("change", function() {
     const v = this.value;
-    if (v === "Lokomotywa prowadząca" || v === "Inna lokomotywa") {
-      openModal('lokModal');
-    } else if (v === "Urządzenie stacjonarne") {
-      openModal('stanModal');
-    }
-    // reset badge when switching type
-    badgeEl.style.display = 'none';
-    badgeEl.textContent = '';
-    // also clear stored values when changing type
-    if (v === "Urządzenie stacjonarne") {
-      document.getElementById('lokomotywa').value = '';
-    } else {
-      document.getElementById('stanowiskoNr').value = '';
+    // reset stored values and buttons
+    badgeEl.style.display = 'none'; badgeEl.textContent = '';
+    document.getElementById('lokomotywa').value = '';
+    document.getElementById('stanowiskoNr').value = '';
+    openLokBtn.style.display = 'none';
+    openStanBtn.style.display = 'none';
+
+    if (v === "lok" || v === "inna") {
+      openLokBtn.style.display = 'inline-block';
+      openModal('lokModal'); // auto-open
+    } else if (v === "stan") {
+      openStanBtn.style.display = 'inline-block';
+      openModal('stanModal'); // auto-open
     }
   });
 
-  // Confirm modal entries -> store in hidden inputs + show badge
+  // Confirm modal entries -> store hidden + show badge
   function confirmLok() {
     const val = document.getElementById('lokInput').value.trim();
     document.getElementById('lokomotywa').value = val;
-    if (val) {
-      badgeEl.textContent = `Lokomotywa: ${val}`;
-      badgeEl.style.display = 'inline-block';
-    }
+    if (val) { badgeEl.textContent = `Lokomotywa: ${val}`; badgeEl.style.display = 'inline-block'; }
     closeModal('lokModal');
   }
   function confirmStan() {
     const val = document.getElementById('stanInput').value.trim();
     document.getElementById('stanowiskoNr').value = val;
-    if (val) {
-      badgeEl.textContent = `Stanowisko: ${val}`;
-      badgeEl.style.display = 'inline-block';
-    }
+    if (val) { badgeEl.textContent = `Stanowisko: ${val}`; badgeEl.style.display = 'inline-block'; }
     closeModal('stanModal');
   }
 
@@ -249,8 +249,15 @@
     const cisGl = parseFloat(document.getElementById("cisnienieGl").value);
     const cisDod = parseFloat(document.getElementById("cisnienieDod").value);
 
+    // Train number must be 1-6 digits
+    const nrP = nrPociaguEl.value;
+    if (!nrP || !/^\\d{1,6}$/.test(nrP)) {
+      document.getElementById("komunikat").innerHTML = "<span class='error'>Podaj poprawny numer pociągu (1–6 cyfr).</span>";
+      return;
+    }
+
     if (isNaN(masaSkladu) || isNaN(masaPociagu) || isNaN(mhr) || isNaN(pw)) {
-      document.getElementById("komunikat").innerHTML = "<span class='error'>Uzupełnij wszystkie pola!</span>";
+      document.getElementById("komunikat").innerHTML = "<span class='error'>Uzupełnij wszystkie pola próby!</span>";
       return;
     }
 
@@ -289,12 +296,13 @@
           <h2>Elektroniczna Karta Próby Hamulca</h2>
           <table>
             <tr><th>Miejsce wykonania próby</th><td>${get("miejsce")}</td></tr>
+            <tr><th>Numer pociągu</th><td>${get("nrPociagu")}</td></tr>
             <tr><th>Data</th><td>${get("data")}</td></tr>
             <tr><th>Godzina</th><td>${get("godzina")}</td></tr>
             <tr><th>Osoba wystawiająca</th><td>${get("osobaWystawiajaca")}</td></tr>
 
             <tr class="section-title"><td colspan="2">Dane próby</td></tr>
-            <tr><th>Próbę wykonano z</th><td>${get("probaZ")}</td></tr>
+            <tr><th>Próbę wykonano z</th><td>${probaZEl.options[probaZEl.selectedIndex]?.text || '-'}</td></tr>
             <tr><th>Oznaczenie lokomotywy</th><td>${get("lokomotywa")}</td></tr>
             <tr><th>Numer stanowiska</th><td>${get("stanowiskoNr")}</td></tr>
 
@@ -327,13 +335,6 @@
     w.document.close();
     w.focus();
     w.print();
-  }
-
-  // Optional: service worker registration for offline/PWA
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW registration failed:', err));
-    });
   }
 </script>
 
