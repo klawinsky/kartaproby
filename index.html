@@ -3,32 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Karta próby hamulca</title>
+  <title>Elektroniczna Karta Próby Hamulca</title>
   <meta name="theme-color" content="#007acc">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
-    h2 { color: #333; }
-    .panel { background: #fff; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
-    label { display: block; margin: 10px 0; }
-    input, select { width: 100%; padding: 8px; margin-top: 4px; }
-    button { padding: 10px 20px; margin-top: 10px; background: #007acc; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    button:disabled { background: #ccc; cursor: not-allowed; }
-    .error { color: red; font-weight: bold; }
-    .success { color: green; font-weight: bold; }
-  </style>
 </head>
 <body>
 
 <h2>Karta próby hamulca 🚆</h2>
 
-<div class="panel">
+<div>
   <h3>Dane ogólne</h3>
-  <label>Miejsce wykonania próby: <input id="miejsce" type="text"></label>
-  <label>Data (DD.MM.YYYY): <input id="data" type="text"></label>
-  <label>Godzina (HH:MM): <input id="godzina" type="text"></label>
-  <label>Osoba wystawiająca kartę: <input id="osobaWystawiajaca" type="text"></label>
+  <label>Miejsce: <input id="miejsce"></label>
+  <label>Data: <input id="data"></label>
+  <label>Godzina: <input id="godzina"></label>
+  <label>Osoba wystawiająca: <input id="osobaWystawiajaca"></label>
   <label>Próbę wykonano z:
     <select id="probaZ">
       <option value="">-- wybierz --</option>
@@ -37,29 +26,29 @@
       <option value="stacjonarne">Urządzenie stacjonarne</option>
     </select>
   </label>
-  <label id="oznaczenieLok" style="display:none;">Oznaczenie lokomotywy: <input id="lokomotywa" type="text"></label>
-  <label id="stanowisko" style="display:none;">Numer stanowiska: <input id="stanowiskoNr" type="text"></label>
-  <label>Osoba wykonująca próbę: <input id="osobaProba" type="text"></label>
-  <label>Maszynista: <input id="maszynista" type="text"></label>
-  <label>Kierownik pociągu: <input id="kierownik" type="text"></label>
+  <label id="oznaczenieLok" style="display:none;">Oznaczenie lokomotywy: <input id="lokomotywa"></label>
+  <label id="stanowisko" style="display:none;">Numer stanowiska: <input id="stanowiskoNr"></label>
+  <label>Osoba wykonująca próbę: <input id="osobaProba"></label>
+  <label>Maszynista: <input id="maszynista"></label>
+  <label>Kierownik pociągu: <input id="kierownik"></label>
 </div>
 
-<div class="panel">
+<div>
   <h3>Próba hamulca</h3>
-  <label>Masa ogólna składu [t]: <input id="masaSkladu" type="number"></label>
-  <label>Masa ogólna pociągu [t]: <input id="masaPociagu" type="number"></label>
+  <label>Masa składu [t]: <input id="masaSkladu" type="number"></label>
+  <label>Masa pociągu [t]: <input id="masaPociagu" type="number"></label>
   <label>Masa hamująca rzeczywista [t]: <input id="mhr" type="number"></label>
   <label>Procent wymagany [%]: <input id="pw" type="number"></label>
   <label>Ciśnienie przewodu głównego [MPa]: <input id="cisnienieGl" type="number" step="0.01"></label>
   <label>Ciśnienie przewodu dodatkowego [MPa]: <input id="cisnienieDod" type="number" step="0.01"></label>
-  <button id="btnOblicz" type="button">Oblicz</button>
+  <button id="btnOblicz">Oblicz</button>
 </div>
 
-<div class="panel">
+<div>
   <h3>Wyniki</h3>
   <p id="wynik"></p>
   <p id="komunikat"></p>
-  <button id="drukujBtn" type="button" disabled>Drukuj</button>
+  <button id="drukujBtn" disabled>Drukuj</button>
 </div>
 
 <script>
@@ -76,11 +65,9 @@ function oblicz() {
   const masaPociagu = parseFloat(document.getElementById("masaPociagu").value);
   const mhr = parseFloat(document.getElementById("mhr").value);
   const pw = parseFloat(document.getElementById("pw").value);
-  const cisGl = parseFloat(document.getElementById("cisnienieGl").value);
-  const cisDod = parseFloat(document.getElementById("cisnienieDod").value);
 
   if (isNaN(masaSkladu) || isNaN(masaPociagu) || isNaN(mhr) || isNaN(pw)) {
-    document.getElementById("komunikat").innerHTML = "<span class='error'>Uzupełnij wszystkie pola!</span>";
+    document.getElementById("komunikat").innerHTML = "<span style='color:red'>Uzupełnij wszystkie pola!</span>";
     return;
   }
 
@@ -88,51 +75,63 @@ function oblicz() {
   const Mhw = Math.ceil((Mo * pw) / 100);
   const Pr = Math.floor((mhr * 100) / Mo);
 
-  let wynikTxt = `Mo: ${Mo} t<br>Mhw: ${Mhw} t<br>Pr: ${Pr}%`;
-  document.getElementById("wynik").innerHTML = wynikTxt;
-
-  let komunikat = "";
-  if (Pr < pw) {
-    komunikat += "<span class='error'>Dodaj wagony lub zmniejsz prędkość!</span><br>";
-  } else {
-    komunikat += "<span class='success'>Warunki spełnione ✅</span><br>";
-  }
-  if (cisGl !== 0.5) komunikat += "<span class='error'>Sprawdź dopuszczalne odchylenia przewodu głównego!</span><br>";
-  if (cisDod !== 0.5 && cisDod !== 0.8) komunikat += "<span class='error'>Sprawdź dopuszczalne odchylenia przewodu dodatkowego!</span><br>";
-
-  document.getElementById("komunikat").innerHTML = komunikat;
-  document.getElementById("drukujBtn").disabled = true;
+  document.getElementById("wynik").innerHTML = `Mo: ${Mo} t<br>Mhw: ${Mhw} t<br>Pr: ${Pr}%`;
+  document.getElementById("komunikat").innerHTML = (Pr < pw) ? "<span style='color:red'>Dodaj wagony lub zmniejsz prędkość!</span>" : "<span style='color:green'>Warunki spełnione ✅</span>";
   document.getElementById("drukujBtn").disabled = false;
 }
 
 function drukuj() {
   const now = new Date();
-  const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}<br>
-  Wygenerowano z systemu ESKA by klawinsky & Copilot`;
+  const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}<br>Wygenerowano z systemu ESKA by klawinsky & Copilot`;
 
   const get = id => document.getElementById(id)?.value || "-";
-
-  const miejsce = get("miejsce");
-  const data = get("data");
-  const godzina = get("godzina");
-  const osobaWystawiajaca = get("osobaWystawiajaca");
-  const probaZ = get("probaZ");
-  const lokomotywa = get("lokomotywa");
-  const stanowiskoNr = get("stanowiskoNr");
-  const masaSkladu = get("masaSkladu");
-  const masaPociagu = get("masaPociagu");
-  const mhr = get("mhr");
-  const pw = get("pw");
-  const cisGl = get("cisnienieGl");
-  const cisDod = get("cisnienieDod");
-  const osobaProba = get("osobaProba");
-  const maszynista = get("maszynista");
-  const kierownik = get("kierownik");
-
   const wynik = document.getElementById("wynik").innerHTML || "-";
 
   const printWindow = window.open("", "_blank");
   printWindow.document.write(`
     <html>
       <head>
-        <title>
+        <title>Karta próby hamulca</title>
+        <link rel="stylesheet" href="print.css">
+      </head>
+      <body>
+        <h2>Elektroniczna Karta Próby Hamulca</h2>
+        <table>
+          <tr><th>Miejsce</th><td>${get("miejsce")}</td></tr>
+          <tr><th>Data</th><td>${get("data")}</td></tr>
+          <tr><th>Godzina</th><td>${get("godzina")}</td></tr>
+          <tr><th>Osoba wystawiająca</th><td>${get("osobaWystawiajaca")}</td></tr>
+          <tr class="section-title"><td colspan="2">Dane próby</td></tr>
+          <tr><th>Próbę wykonano z</th><td>${get("probaZ")}</td></tr>
+          <tr><th>Oznaczenie lokomotywy</th><td>${get("lokomotywa")}</td></tr>
+          <tr><th>Numer stanowiska</th><td>${get("stanowiskoNr")}</td></tr>
+          <tr><th>Masa składu</th><td>${get("masaSkladu")} t</td></tr>
+          <tr><th>Masa pociągu</th><td>${get("masaPociagu")} t</td></tr>
+          <tr><th>Masa hamująca rzeczywista</th><td>${get("mhr")} t</td></tr>
+          <tr><th>Procent wymagany</th><td>${get("pw")}%</td></tr>
+          <tr><th>Obliczenia</th><td>${wynik}</td></tr>
+          <tr><th>Ciśnienie przewodu głównego</th><td>${get("cisnienieGl")} MPa</td></tr>
+          <tr><th>Ciśnienie przewodu dodatkowego</th><td>${get("cisnienieDod")} MPa</td></tr>
+          <tr class="section-title"><td colspan="2">Podpisy pracowników</td></tr>
+          <tr><th>Osoba wykonująca próbę</th><td class="signature-line">${get("osobaProba")}</td></tr>
+          <tr><th>Maszynista</th><td class="signature-line">${get("maszynista")}</td></tr>
+          <tr><th>Kierownik pociągu</th><td class="signature-line">${get("kierownik")}</td></tr>
+        </table>
+        <footer>${footer}</footer>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.print();
+}
+
+// Rejestracja service workera
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW registration failed:', err));
+  });
+}
+</script>
+
+</body>
+</html>
