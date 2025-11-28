@@ -7,117 +7,268 @@
   <meta name="theme-color" content="#007acc">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+      color: #222;
+    }
+    h2 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .panel {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .panel h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      color: #005a9e;
+    }
+    label {
+      display: block;
+      margin: 10px 0;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+    }
+    button {
+      padding: 10px 16px;
+      margin-top: 10px;
+      background: #007acc;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .error {
+      color: #b00020;
+      font-weight: 600;
+    }
+    .success {
+      color: #0a7a2f;
+      font-weight: 600;
+    }
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 720px) {
+      .row-2 { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
 <h2>Karta próby hamulca 🚆</h2>
 
-<div>
+<div class="panel">
   <h3>Dane ogólne</h3>
-  <label>Miejsce: <input id="miejsce"></label>
-  <label>Data: <input id="data"></label>
-  <label>Godzina: <input id="godzina"></label>
-  <label>Osoba wystawiająca: <input id="osobaWystawiajaca"></label>
-  <label>Próbę wykonano z:
-    <select id="probaZ">
-      <option value="">-- wybierz --</option>
-      <option value="lokProw">Lokomotywa prowadząca</option>
-      <option value="lokInna">Inna lokomotywa</option>
-      <option value="stacjonarne">Urządzenie stacjonarne</option>
-    </select>
-  </label>
-  <label id="oznaczenieLok" style="display:none;">Oznaczenie lokomotywy: <input id="lokomotywa"></label>
-  <label id="stanowisko" style="display:none;">Numer stanowiska: <input id="stanowiskoNr"></label>
-  <label>Osoba wykonująca próbę: <input id="osobaProba"></label>
-  <label>Maszynista: <input id="maszynista"></label>
-  <label>Kierownik pociągu: <input id="kierownik"></label>
-  <!-- nowe pola na wagony -->
-  <label>Numer pierwszego wagonu: <input id="zaLok1"></label>
-  <label>Numer drugiego wagonu: <input id="zaLok2"></label>
-  <label>Numer przedostatniego wagonu: <input id="koniec1"></label>
-  <label>Numer ostatniego wagonu: <input id="koniec2"></label>
+  <div class="row-2">
+    <label>Miejsce wykonania próby:
+      <input id="miejsce" type="text" autocomplete="off">
+    </label>
+    <label>Data (DD.MM.YYYY):
+      <input id="data" type="text" inputmode="numeric" placeholder="DD.MM.RRRR">
+    </label>
+    <label>Godzina (HH:MM):
+      <input id="godzina" type="text" inputmode="numeric" placeholder="HH:MM">
+    </label>
+    <label>Osoba wystawiająca kartę:
+      <input id="osobaWystawiajaca" type="text" autocomplete="off">
+    </label>
+    <label>Próbę wykonano z:
+      <select id="probaZ">
+        <option value="">-- wybierz --</option>
+        <option value="Lokomotywa prowadząca">Lokomotywa prowadząca</option>
+        <option value="Inna lokomotywa">Inna lokomotywa</option>
+        <option value="Urządzenie stacjonarne">Urządzenie stacjonarne</option>
+      </select>
+    </label>
+    <label id="oznaczenieLok" style="display:none;">Oznaczenie lokomotywy:
+      <input id="lokomotywa" type="text" autocomplete="off">
+    </label>
+    <label id="stanowisko" style="display:none;">Numer stanowiska:
+      <input id="stanowiskoNr" type="text" autocomplete="off">
+    </label>
+    <label>Numer pierwszego wagonu:
+      <input id="zaLok1" type="text" autocomplete="off">
+    </label>
+    <label>Numer drugiego wagonu:
+      <input id="zaLok2" type="text" autocomplete="off">
+    </label>
+    <label>Numer przedostatniego wagonu:
+      <input id="koniec1" type="text" autocomplete="off">
+    </label>
+    <label>Numer ostatniego wagonu:
+      <input id="koniec2" type="text" autocomplete="off">
+    </label>
+    <label>Osoba wykonująca próbę:
+      <input id="osobaProba" type="text" autocomplete="off">
+    </label>
+    <label>Maszynista:
+      <input id="maszynista" type="text" autocomplete="off">
+    </label>
+    <label>Kierownik pociągu:
+      <input id="kierownik" type="text" autocomplete="off">
+    </label>
+  </div>
 </div>
 
-<div>
+<div class="panel">
   <h3>Próba hamulca</h3>
-  <label>Masa składu [t]: <input id="masaSkladu" type="number"></label>
-  <label>Masa pociągu [t]: <input id="masaPociagu" type="number"></label>
-  <label>Masa hamująca rzeczywista [t]: <input id="mhr" type="number"></label>
-  <label>Procent wymagany [%]: <input id="pw" type="number"></label>
-  <label>Ciśnienie przewodu głównego [MPa]: <input id="cisnienieGl" type="number" step="0.01"></label>
-  <label>Ciśnienie przewodu dodatkowego [MPa]: <input id="cisnienieDod" type="number" step="0.01"></label>
-  <button id="btnOblicz">Oblicz</button>
+  <div class="row-2">
+    <label>Masa ogólna składu [t]:
+      <input id="masaSkladu" type="number" step="1" min="0">
+    </label>
+    <label>Masa ogólna pociągu [t]:
+      <input id="masaPociagu" type="number" step="1" min="0">
+    </label>
+    <label>Masa hamująca rzeczywista [t]:
+      <input id="mhr" type="number" step="1" min="0">
+    </label>
+    <label>Procent wymagany [%]:
+      <input id="pw" type="number" step="1" min="0" max="100">
+    </label>
+    <label>Ciśnienie przewodu głównego [MPa]:
+      <input id="cisnienieGl" type="number" step="0.01" min="0">
+    </label>
+    <label>Ciśnienie przewodu dodatkowego [MPa]:
+      <input id="cisnienieDod" type="number" step="0.01" min="0">
+    </label>
+  </div>
+  <button id="btnOblicz" type="button">Oblicz</button>
 </div>
 
-<div>
+<div class="panel">
   <h3>Wyniki</h3>
   <p id="wynik"></p>
   <p id="komunikat"></p>
-  <button id="drukujBtn" disabled>Drukuj</button>
+  <button id="drukujBtn" type="button" disabled>Drukuj</button>
 </div>
 
 <script>
-document.getElementById("probaZ").addEventListener("change", function() {
-  document.getElementById("oznaczenieLok").style.display = (this.value === "lokProw" || this.value === "lokInna") ? "block" : "none";
-  document.getElementById("stanowisko").style.display = (this.value === "stacjonarne") ? "block" : "none";
-});
+  // Pokazywanie pól zależnych od źródła próby
+  document.getElementById("probaZ").addEventListener("change", function() {
+    const v = this.value;
+    document.getElementById("oznaczenieLok").style.display =
+      (v === "Lokomotywa prowadząca" || v === "Inna lokomotywa") ? "block" : "none";
+    document.getElementById("stanowisko").style.display =
+      (v === "Urządzenie stacjonarne") ? "block" : "none";
+  });
 
-document.getElementById("btnOblicz").addEventListener("click", oblicz);
-document.getElementById("drukujBtn").addEventListener("click", drukuj);
+  document.getElementById("btnOblicz").addEventListener("click", oblicz);
+  document.getElementById("drukujBtn").addEventListener("click", drukuj);
 
-function oblicz() {
-  const masaSkladu = parseFloat(document.getElementById("masaSkladu").value);
-  const masaPociagu = parseFloat(document.getElementById("masaPociagu").value);
-  const mhr = parseFloat(document.getElementById("mhr").value);
-  const pw = parseFloat(document.getElementById("pw").value);
+  function oblicz() {
+    const masaSkladu = parseFloat(document.getElementById("masaSkladu").value);
+    const masaPociagu = parseFloat(document.getElementById("masaPociagu").value);
+    const mhr = parseFloat(document.getElementById("mhr").value);
+    const pw = parseFloat(document.getElementById("pw").value);
+    const cisGl = parseFloat(document.getElementById("cisnienieGl").value);
+    const cisDod = parseFloat(document.getElementById("cisnienieDod").value);
 
-  if (isNaN(masaSkladu) || isNaN(masaPociagu) || isNaN(mhr) || isNaN(pw)) {
-    document.getElementById("komunikat").innerHTML = "<span style='color:red'>Uzupełnij wszystkie pola!</span>";
-    return;
+    if (isNaN(masaSkladu) || isNaN(masaPociagu) || isNaN(mhr) || isNaN(pw)) {
+      document.getElementById("komunikat").innerHTML = "<span class='error'>Uzupełnij wszystkie pola!</span>";
+      return;
+    }
+
+    const Mo = (masaSkladu >= 200) ? masaSkladu : masaPociagu;
+    const Mhw = Math.ceil((Mo * pw) / 100);
+    const Pr = Math.floor((mhr * 100) / Mo);
+
+    document.getElementById("wynik").innerHTML =
+      `Mo: ${Mo} t<br>Mhw: ${Mhw} t<br>Pr: ${Pr}%`;
+
+    let komunikat = "";
+    if (Pr < pw) {
+      komunikat += "<span class='error'>Dodaj wagony lub zmniejsz prędkość!</span><br>";
+    } else {
+      komunikat += "<span class='success'>Warunki spełnione ✅</span><br>";
+    }
+    if (!isNaN(cisGl) && cisGl !== 0.5) {
+      komunikat += "<span class='error'>Sprawdź dopuszczalne odchylenia przewodu głównego!</span><br>";
+    }
+    if (!isNaN(cisDod) && (cisDod !== 0.5 && cisDod !== 0.8)) {
+      komunikat += "<span class='error'>Sprawdź dopuszczalne odchylenia przewodu dodatkowego!</span><br>";
+    }
+
+    document.getElementById("komunikat").innerHTML = komunikat;
+    document.getElementById("drukujBtn").disabled = false;
   }
 
-  const Mo = (masaSkladu >= 200) ? masaSkladu : masaPociagu;
-  const Mhw = Math.ceil((Mo * pw) / 100);
-  const Pr = Math.floor((mhr * 100) / Mo);
+  function drukuj() {
+    const now = new Date();
+    const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}<br>Wygenerowano z systemu ESKA by klawinsky & Copilot`;
+    const get = id => document.getElementById(id)?.value || "-";
+    const wynik = document.getElementById("wynik").innerHTML || "-";
 
-  document.getElementById("wynik").innerHTML = `Mo: ${Mo} t<br>Mhw: ${Mhw} t<br>Pr: ${Pr}%`;
-  document.getElementById("komunikat").innerHTML = (Pr < pw) ? "<span style='color:red'>Dodaj wagony lub zmniejsz prędkość!</span>" : "<span style='color:green'>Warunki spełnione ✅</span>";
-  document.getElementById("drukujBtn").disabled = false;
-}
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Karta próby hamulca</title>
+          <link rel="stylesheet" href="print.css">
+        </head>
+        <body>
+          <h2>Elektroniczna Karta Próby Hamulca</h2>
+          <table>
+            <tr><th>Miejsce wykonania próby</th><td>${get("miejsce")}</td></tr>
+            <tr><th>Data</th><td>${get("data")}</td></tr>
+            <tr><th>Godzina</th><td>${get("godzina")}</td></tr>
+            <tr><th>Osoba wystawiająca</th><td>${get("osobaWystawiajaca")}</td></tr>
+            <tr class="section-title"><td colspan="2">Dane próby</td></tr>
+            <tr><th>Próbę wykonano z</th><td>${get("probaZ")}</td></tr>
+            <tr><th>Oznaczenie lokomotywy</th><td>${get("lokomotywa")}</td></tr>
+            <tr><th>Numer stanowiska</th><td>${get("stanowiskoNr")}</td></tr>
+            <tr><th>Numery wagonów za lokomotywą</th><td>${get("zaLok1")}, ${get("zaLok2")}</td></tr>
+            <tr><th>Numery wagonów na końcu składu</th><td>${get("koniec1")}, ${get("koniec2")}</td></tr>
+            <tr class="section-title"><td colspan="2">Parametry i wyniki</td></tr>
+            <tr><th>Masa ogólna składu</th><td>${get("masaSkladu")} t</td></tr>
+            <tr><th>Masa ogólna pociągu</th><td>${get("masaPociagu")} t</td></tr>
+            <tr><th>Masa hamująca rzeczywista</th><td>${get("mhr")} t</td></tr>
+            <tr><th>Procent wymagany</th><td>${get("pw")}%</td></tr>
+            <tr><th>Obliczenia (Mo, Mhw, Pr)</th><td>${wynik}</td></tr>
+            <tr><th>Ciśnienie przewodu głównego</th><td>${get("cisnienieGl")} MPa</td></tr>
+            <tr><th>Ciśnienie przewodu dodatkowego</th><td>${get("cisnienieDod")} MPa</td></tr>
+            <tr class="section-title"><td colspan="2">Podpisy pracowników</td></tr>
+            <tr><th>Osoba wykonująca próbę</th><td class="signature-line">${get("osobaProba")}</td></tr>
+            <tr><th>Maszynista</th><td class="signature-line">${get("maszynista")}</td></tr>
+            <tr><th>Kierownik pociągu</th><td class="signature-line">${get("kierownik")}</td></tr>
+          </table>
+          <footer>${footer}</footer>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  }
 
-function drukuj() {
-  const now = new Date();
-  const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}<br>Wygenerowano z systemu ESKA by klawinsky & Copilot`;
+  // Rejestracja service workera (opcjonalnie dla PWA/offline)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .catch(err => console.error('SW registration failed:', err));
+    });
+  }
+</script>
 
-  const get = id => document.getElementById(id)?.value || "-";
-  const wynik = document.getElementById("wynik").innerHTML || "-";
-
-  const printWindow = window.open("", "_blank");
-  printWindow.document.write(`
-    <html>
-      <head>
-        <title>Karta próby hamulca</title>
-        <link rel="stylesheet" href="print.css">
-      </head>
-      <body>
-        <h2>Elektroniczna Karta Próby Hamulca</h2>
-        <table>
-          <tr><th>Miejsce</th><td>${get("miejsce")}</td></tr>
-          <tr><th>Data</th><td>${get("data")}</td></tr>
-          <tr><th>Godzina</th><td>${get("godzina")}</td></tr>
-          <tr><th>Osoba wystawiająca</th><td>${get("osobaWystawiajaca")}</td></tr>
-          <tr class="section-title"><td colspan="2">Dane próby</td></tr>
-          <tr><th>Próbę wykonano z</th><td>${get("probaZ")}</td></tr>
-          <tr><th>Oznaczenie lokomotywy</th><td>${get("lokomotywa")}</td></tr>
-          <tr><th>Numer stanowiska</th><td>${get("stanowiskoNr")}</td></tr>
-          <tr><th>Masa składu</th><td>${get("masaSkladu")} t</td></tr>
-          <tr><th>Masa pociągu</th><td>${get("masaPociagu")} t</td></tr>
-          <tr><th>Masa hamująca rzeczywista</th><td>${get("mhr")} t</td></tr>
-          <tr><th>Procent wymagany</th><td>${get("pw")}%</td></tr>
-          <tr><th>Obliczenia</th><td>${wynik}</td></tr>
-          <tr><th>Ciśnienie przewodu głównego</th><td>${get("cisnienieGl")} MPa</td></tr>
-          <tr><th>Ciśnienie przewodu dodatkowego</th><td>${get("cisnienieDod")} MPa</td></tr>
-          <tr><th>Pojazdy za lokomotywą</th><td>${get("zaLok1")}, ${get("zaLok2")}</td></tr>
-          <tr><th>Pojazdy na końcu składu</th><td>${get("koniec1")}, ${get("koniec2")}</td></tr>
-          <tr class="section-title"><td colspan="2">Podpisy pracowników</td></tr>
-          <tr><th>Osoba wykonująca próbę</th><td class="signature-line">${get("osobaProba")}</td></tr
+</body>
+</html>
