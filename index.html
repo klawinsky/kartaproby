@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Karta próby hamulca</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    h2 { color: #333; }
+    .panel { background: #fff; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    label { display: block; margin: 10px 0; }
+    input, select { width: 100%; padding: 8px; margin-top: 4px; }
+    button { padding: 10px 20px; margin-top: 10px; background: #007acc; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    .error { color: red; font-weight: bold; }
+    .success { color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h2>Karta próby hamulca 🚆</h2>
+
+<div class="panel">
+  <h3>Panel 1 – Dane ogólne</h3>
+  <label>Miejsce wykonania próby: <input id="miejsce" type="text"></label>
+  <label>Data (DD.MM.YYYY): <input id="data" type="text"></label>
+  <label>Godzina (HH:MM): <input id="godzina" type="text"></label>
+  <label>Osoba wystawiająca kartę: <input id="osobaWystawiajaca" type="text"></label>
+  <label>Próbę wykonano z:
+    <select id="probaZ">
+      <option value="">-- wybierz --</option>
+      <option value="lokProw">Lokomotywa prowadząca</option>
+      <option value="lokInna">Inna lokomotywa</option>
+      <option value="stacjonarne">Urządzenie stacjonarne</option>
+    </select>
+  </label>
+  <label id="oznaczenieLok" style="display:none;">Oznaczenie lokomotywy: <input id="lokomotywa" type="text"></label>
+  <label id="stanowisko" style="display:none;">Numer stanowiska: <input id="stanowiskoNr" type="text"></label>
+  <label>Osoba wykonująca próbę: <input id="osobaProba" type="text"></label>
+  <label>Maszynista: <input id="maszynista" type="text"></label>
+  <label>Kierownik pociągu: <input id="kierownik" type="text"></label>
+  <label>Ilość wagonów: <input id="wagony" type="number"></label>
+  <label>Długość pociągu [m]: <input id="dlugosc" type="number"></label>
+</div>
+
+<div class="panel">
+  <h3>Panel 2 – Próba hamulca</h3>
+  <label>Masa ogólna składu [t]: <input id="masaSkladu" type="number"></label>
+  <label>Masa ogólna pociągu [t]: <input id="masaPociagu" type="number"></label>
+  <label>Masa hamująca rzeczywista [t]: <input id="mhr" type="number"></label>
+  <label>Procent wymagany [%]: <input id="pw" type="number"></label>
+  <label>Ciśnienie przewodu głównego [MPa]: <input id="cisnienieGl" type="number" step="0.01"></label>
+  <label>Ciśnienie przewodu dodatkowego [MPa]: <input id="cisnienieDod" type="number" step="0.01"></label>
+  <label>Hamulec elektrodynamiczny:
+    <select id="hamED"><option>TAK</option><option>NIE</option></select>
+  </label>
+  <label>Układ sterowania EP:
+    <select id="hamEP"><option>TAK</option><option>NIE</option></select>
+  </label>
+  <label>Układ zamykania drzwi:
+    <select id="drzwi"><option>TAK</option><option>NIE</option></select>
+  </label>
+  <label>Inne urządzenia:
+    <select id="inne"><option>TAK</option><option>NIE</option></select>
+  </label>
+  <label>Numery pojazdów za lokomotywą:
+    <input id="zaLok1" type="text" placeholder="XX-XX-XXXX-XXX-X">
+    <input id="zaLok2" type="text" placeholder="XX-XX-XXXX-XXX-X">
+  </label>
+  <label>Numery pojazdów na końcu składu:
+    <input id="koniec1" type="text" placeholder="XX-XX-XXXX-XXX-X">
+    <input id="koniec2" type="text" placeholder="XX-XX-XXXX-XXX-X">
+  </label>
+  <label>Czy na końcu składu wagon z nieczynnym hamulcem?
+    <select id="wagonNieczynny"><option>NIE</option><option>TAK</option></select>
+  </label>
+  <label id="wagonNrLabel" style="display:none;">Numer wagonu: <input id="wagonNr" type="text" placeholder="XX-XX-XXXX-XXX-X"></label>
+  <button onclick="oblicz()">Oblicz</button>
+</div>
+
+<div class="panel">
+  <h3>Wyniki</h3>
+  <p id="wynik"></p>
+  <p id="komunikat"></p>
+  <button id="drukujBtn" onclick="drukuj()" disabled>Drukuj</button>
+</div>
+
+<script>
+document.getElementById("probaZ").addEventListener("change", function() {
+  document.getElementById("oznaczenieLok").style.display = (this.value === "lokProw" || this.value === "lokInna") ? "block" : "none";
+  document.getElementById("stanowisko").style.display = (this.value === "stacjonarne") ? "block" : "none";
+});
+document.getElementById("wagonNieczynny").addEventListener("change", function() {
+  document.getElementById("wagonNrLabel").style.display = (this.value === "TAK") ? "block" : "none";
+});
+
+function oblicz() {
+  let masaSkladu = parseFloat(document.getElementById("masaSkladu").value);
+  let masaPociagu = parseFloat(document.getElementById("masaPociagu").value);
+  let mhr = parseFloat(document.getElementById("mhr").value);
+  let pw = parseFloat(document.getElementById("pw").value);
+  let cisGl = parseFloat(document.getElementById("cisnienieGl").value);
+  let cisDod = parseFloat(document.getElementById("cisnienieDod").value);
+
+  // wybór Mo zgodnie z zasadą
+  let fast = false; // uproszczenie: można dodać checkbox jak w wersji 1
+  let intl = false;
+  let Mo = (!fast && !intl && masaSkladu >= 200) ? masaSkladu : masaPociagu;
+
+  let Mhw = Math.ceil((Mo * pw) / 100);
+  let Pr = Math.floor((mhr * 100) / Mo);
+
+  let wynikTxt = `Masa ogólna (Mo): ${Mo} t<br>
+                  Masa hamująca wymagana: ${Mhw} t<br>
+                  Procent rzeczywisty: ${Pr}%`;
+
+  document.getElementById("wynik").innerHTML = wynikTxt;
+
+  let komunikat =
