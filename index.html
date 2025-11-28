@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Karta próby hamulca</title>
+  <meta name="theme-color" content="#007acc">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
     h2 { color: #333; }
@@ -51,18 +54,10 @@
   <label>Procent wymagany [%]: <input id="pw" type="number"></label>
   <label>Ciśnienie przewodu głównego [MPa]: <input id="cisnienieGl" type="number" step="0.01"></label>
   <label>Ciśnienie przewodu dodatkowego [MPa]: <input id="cisnienieDod" type="number" step="0.01"></label>
-  <label>Hamulec elektrodynamiczny:
-    <select id="hamED"><option>TAK</option><option>NIE</option></select>
-  </label>
-  <label>Układ sterowania EP:
-    <select id="hamEP"><option>TAK</option><option>NIE</option></select>
-  </label>
-  <label>Układ zamykania drzwi:
-    <select id="drzwi"><option>TAK</option><option>NIE</option></select>
-  </label>
-  <label>Inne urządzenia:
-    <select id="inne"><option>TAK</option><option>NIE</option></select>
-  </label>
+  <label>Hamulec elektrodynamiczny: <select id="hamED"><option>TAK</option><option>NIE</option></select></label>
+  <label>Układ sterowania EP: <select id="hamEP"><option>TAK</option><option>NIE</option></select></label>
+  <label>Układ zamykania drzwi: <select id="drzwi"><option>TAK</option><option>NIE</option></select></label>
+  <label>Inne urządzenia: <select id="inne"><option>TAK</option><option>NIE</option></select></label>
   <label>Numery pojazdów za lokomotywą:
     <input id="zaLok1" type="text" placeholder="XX-XX-XXXX-XXX-X">
     <input id="zaLok2" type="text" placeholder="XX-XX-XXXX-XXX-X">
@@ -75,14 +70,14 @@
     <select id="wagonNieczynny"><option>NIE</option><option>TAK</option></select>
   </label>
   <label id="wagonNrLabel" style="display:none;">Numer wagonu: <input id="wagonNr" type="text" placeholder="XX-XX-XXXX-XXX-X"></label>
-  <button onclick="oblicz()">Oblicz</button>
+  <button id="btnOblicz" type="button">Oblicz</button>
 </div>
 
 <div class="panel">
   <h3>Wyniki</h3>
   <p id="wynik"></p>
   <p id="komunikat"></p>
-  <button id="drukujBtn" onclick="drukuj()" disabled>Drukuj</button>
+  <button id="drukujBtn" type="button" disabled>Drukuj</button>
 </div>
 
 <script>
@@ -94,6 +89,9 @@ document.getElementById("wagonNieczynny").addEventListener("change", function() 
   document.getElementById("wagonNrLabel").style.display = (this.value === "TAK") ? "block" : "none";
 });
 
+document.getElementById("btnOblicz").addEventListener("click", oblicz);
+document.getElementById("drukujBtn").addEventListener("click", drukuj);
+
 function oblicz() {
   let masaSkladu = parseFloat(document.getElementById("masaSkladu").value);
   let masaPociagu = parseFloat(document.getElementById("masaPociagu").value);
@@ -103,9 +101,7 @@ function oblicz() {
   let cisDod = parseFloat(document.getElementById("cisnienieDod").value);
 
   // wybór Mo zgodnie z zasadą
-  let fast = false; // uproszczenie: można dodać checkbox jak w wersji 1
-  let intl = false;
-  let Mo = (!fast && !intl && masaSkladu >= 200) ? masaSkladu : masaPociagu;
+  let Mo = (masaSkladu >= 200) ? masaSkladu : masaPociagu;
 
   let Mhw = Math.ceil((Mo * pw) / 100);
   let Pr = Math.floor((mhr * 100) / Mo);
@@ -116,4 +112,10 @@ function oblicz() {
 
   document.getElementById("wynik").innerHTML = wynikTxt;
 
-  let komunikat =
+  let komunikat = "";
+  if (Pr < pw) {
+    komunikat += "<span class='error'>Dodaj wagony lub zmniejsz prędkość pociągu zgodnie z tabelami!</span><br>";
+  } else {
+    komunikat += "<span class='success'>Warunki spełnione ✅</span><br>";
+  }
+  if (cisGl !== 0.5) komunikat
