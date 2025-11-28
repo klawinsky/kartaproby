@@ -280,54 +280,67 @@
   // Print
   document.getElementById("drukujBtn").addEventListener("click", drukuj);
   function drukuj() {
-    const now = new Date();
-    const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}<br>Wygenerowano z systemu ESKA by klawinsky & Copilot`;
-    const get = id => document.getElementById(id)?.value || "-";
-    const wynik = document.getElementById("wynik").innerHTML || "-";
+  const now = new Date();
+  const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}<br>Wygenerowano z systemu ESKA by klawinsky & Copilot`;
 
-    const html = `
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <title>Karta próby hamulca</title>
-          <link rel="stylesheet" href="print.css">
-        </head>
-        <body>
-          <h2>Elektroniczna Karta Próby Hamulca</h2>
-          <table>
-            <tr><th>Miejsce wykonania próby</th><td>${get("miejsce")}</td></tr>
-            <tr><th>Numer pociągu</th><td>${get("nrPociagu")}</td></tr>
-            <tr><th>Data</th><td>${get("data")}</td></tr>
-            <tr><th>Godzina</th><td>${get("godzina")}</td></tr>
-            <tr><th>Osoba wystawiająca</th><td>${get("osobaWystawiajaca")}</td></tr>
+  const get = id => document.getElementById(id)?.value || "-";
+  const probaZEl = document.getElementById("probaZ");
+  const probaZTxt = probaZEl?.options[probaZEl.selectedIndex]?.text || "-";
+  const wynik = document.getElementById("wynik").innerHTML || "-";
 
-            <tr class="section-title"><td colspan="2">Dane próby</td></tr>
-            <tr><th>Próbę wykonano z</th><td>${probaZEl.options[probaZEl.selectedIndex]?.text || '-'}</td></tr>
-            <tr><th>Oznaczenie lokomotywy</th><td>${get("lokomotywa")}</td></tr>
-            <tr><th>Numer stanowiska</th><td>${get("stanowiskoNr")}</td></tr>
+  const html = `
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Karta próby hamulca</title>
+        <link rel="stylesheet" href="print.css">
+      </head>
+      <body>
+        <h2>Elektroniczna Karta Próby Hamulca</h2>
 
-            <tr class="section-title"><td colspan="2">Wagony</td></tr>
-            <tr><th>Numery wagonów za lokomotywą</th><td>${get("zaLok1")}, ${get("zaLok2")}</td></tr>
-            <tr><th>Numery wagonów na końcu składu</th><td>${get("koniec1")}, ${get("koniec2")}</td></tr>
+        <table>
+          <tr><th>Miejsce wykonania próby</th><td>${get("miejsce")}</td></tr>
+          <tr><th>Numer pociągu</th><td>${get("nrPociagu")}</td></tr>
+          <tr><th>Data</th><td>${get("data")}</td></tr>
+          <tr><th>Godzina</th><td>${get("godzina")}</td></tr>
+          <tr><th>Osoba wystawiająca</th><td>${get("osobaWystawiajaca")}</td></tr>
 
-            <tr class="section-title"><td colspan="2">Parametry i wyniki</td></tr>
-            <tr><th>Masa ogólna składu</th><td>${get("masaSkladu")} t</td></tr>
-            <tr><th>Masa ogólna pociągu</th><td>${get("masaPociagu")} t</td></tr>
-            <tr><th>Masa hamująca rzeczywista</th><td>${get("mhr")} t</td></tr>
-            <tr><th>Procent wymagany</th><td>${get("pw")}%</td></tr>
-            <tr><th>Obliczenia (Mo, Mhw, Pr)</th><td>${wynik}</td></tr>
-            <tr><th>Ciśnienie przewodu głównego</th><td>${get("cisnienieGl")} MPa</td></tr>
-            <tr><th>Ciśnienie przewodu dodatkowego</th><td>${get("cisnienieDod")} MPa</td></tr>
+          <tr class="section-title"><td colspan="2">Dane próby</td></tr>
+          <tr><th>Próbę wykonano z</th><td>${probaZTxt}</td></tr>
+          <tr><th>Oznaczenie lokomotywy</th><td>${get("lokomotywa")}</td></tr>
+          <tr><th>Numer stanowiska</th><td>${get("stanowiskoNr")}</td></tr>
 
-            <tr class="section-title"><td colspan="2">Podpisy pracowników</td></tr>
-            <tr><th>Osoba wykonująca próbę</th><td class="signature-line">${get("osobaProba")}</td></tr>
-            <tr><th>Maszynista</th><td class="signature-line">${get("maszynista")}</td></tr>
-            <tr><th>Kierownik pociągu</th><td class="signature-line">${get("kierownik")}</td></tr>
-          </table>
-          <footer>${footer}</footer>
-        </body>
-      </html>
-    `;
+          <tr class="section-title"><td colspan="2">Wagony</td></tr>
+          <tr><th>Numery wagonów za lokomotywą</th><td>${get("zaLok1")}, ${get("zaLok2")}</td></tr>
+          <tr><th>Numery wagonów na końcu składu</th><td>${get("koniec1")}, ${get("koniec2")}</td></tr>
+
+          <tr class="section-title"><td colspan="2">Parametry i wyniki</td></tr>
+          <tr><th>Masa ogólna składu</th><td>${get("masaSkladu")} t</td></tr>
+          <tr><th>Masa ogólna pociągu</th><td>${get("masaPociagu")} t</td></tr>
+          <tr><th>Masa hamująca rzeczywista</th><td>${get("mhr")} t</td></tr>
+          <tr><th>Procent wymagany</th><td>${get("pw")}%</td></tr>
+          <tr><th>Obliczenia (Mo, Mhw, Pr)</th><td>${wynik}</td></tr>
+          <tr><th>Ciśnienie przewodu głównego</th><td>${get("cisnienieGl")} MPa</td></tr>
+          <tr><th>Ciśnienie przewodu dodatkowego</th><td>${get("cisnienieDod")} MPa</td></tr>
+
+          <tr class="section-title"><td colspan="2">Podpisy pracowników</td></tr>
+          <tr><th>Osoba wykonująca próbę</th><td class="signature-line">${get("osobaProba")}</td></tr>
+          <tr><th>Maszynista</th><td class="signature-line">${get("maszynista")}</td></tr>
+          <tr><th>Kierownik pociągu</th><td class="signature-line">${get("kierownik")}</td></tr>
+        </table>
+
+        <footer>${footer}</footer>
+      </body>
+    </html>
+  `;
+
+  const w = window.open("", "_blank");
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  w.print();
+}
 
     const w = window.open("", "_blank");
     w.document.open();
