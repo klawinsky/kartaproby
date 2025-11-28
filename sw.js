@@ -1,6 +1,6 @@
 // Service Worker dla aplikacji "Karta próby hamulca"
 
-const CACHE_VERSION = 'v1.0.0';   // podbijaj wersję przy każdej zmianie
+const CACHE_VERSION = 'v1.0.3'; // Zmieniaj przy każdej aktualizacji frontendu
 const CACHE_NAME = `hamulec-${CACHE_VERSION}`;
 
 const CORE_ASSETS = [
@@ -63,3 +63,4 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
