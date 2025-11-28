@@ -108,21 +108,18 @@ function oblicz() {
 
 function drukuj() {
   const now = new Date();
-  const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
-  const content = document.getElementById("wynik").innerHTML + "<br>" + document.getElementById("komunikat").innerHTML + "<hr>" + footer;
-  const printWindow = window.open("", "_blank");
-  printWindow.document.write("<html><head><title>Karta próby hamulca</title></head><body>" + content + "</body></html>");
-  printWindow.document.close();
-  printWindow.print();
-}
+  const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}<br>
+  Wygenerowano z systemu ESKA by klawinsky & Copilot`;
 
-// Rejestracja service workera
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .catch(err => console.error('SW registration failed:', err));
-  });
-}
-</script>
-</body>
-</html>
+  // Pobieranie danych
+  const miejsce = document.getElementById("miejsce").value || "-";
+  const data = document.getElementById("data").value || "-";
+  const godzina = document.getElementById("godzina").value || "-";
+  const osobaWystawiajaca = document.getElementById("osobaWystawiajaca").value || "-";
+  const probaZ = document.getElementById("probaZ").value || "-";
+  const lokomotywa = document.getElementById("lokomotywa")?.value || "-";
+  const stanowiskoNr = document.getElementById("stanowiskoNr")?.value || "-";
+  const masaSkladu = document.getElementById("masaSkladu").value || "-";
+  const masaPociagu = document.getElementById("masaPociagu").value || "-";
+  const mhr = document.getElementById("mhr").value || "-";
+  const pw
