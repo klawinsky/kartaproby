@@ -1,12 +1,13 @@
-// Service Worker dla aplikacji "Karta próby hamulca"
+// Service Worker dla aplikacji "Elektroniczna Karta Próby Hamulca"
 
-const CACHE_VERSION = 'v1.0.3'; // Zmieniaj przy każdej aktualizacji frontendu
+const CACHE_VERSION = 'v1.0.5';   // podbijaj wersję przy każdej zmianie frontendu
 const CACHE_NAME = `hamulec-${CACHE_VERSION}`;
 
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './print.css',
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];
@@ -63,4 +64,3 @@ self.addEventListener('fetch', event => {
     })
   );
 });
-
