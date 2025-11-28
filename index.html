@@ -8,6 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
   <style>
+    /* Layout: first-version simple panels */
     body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; color: #222; }
     h2 { text-align: center; margin-bottom: 20px; }
     .panel { background: #fff; padding: 15px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 6px; }
@@ -18,54 +19,120 @@
     button:disabled { background: #ccc; cursor: not-allowed; }
     .error { color: #b00020; font-weight: 600; }
     .success { color: #0a7a2f; font-weight: 600; }
+    .inline-badge { display:inline-block; margin-top:6px; padding:4px 8px; background:#eef5ff; border:1px solid #bcd3ff; border-radius:4px; font-size:12px; color:#1152a3; }
 
     /* Modal */
-    .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); }
-    .modal-content { background:#fff; margin:10% auto; padding:20px; border-radius:8px; width:320px; box-shadow:0 4px 12px rgba(0,0,0,0.2); }
-    .modal h3 { margin:0 0 10px; }
+    .modal { display:none; position:fixed; z-index:1000; inset:0; background:rgba(0,0,0,0.5); }
+    .modal-content { background:#fff; width:340px; max-width:90vw; margin:10% auto; padding:16px 16px 12px; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.25); }
+    .modal header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    .modal h3 { margin:0; font-size:16px; }
+    .modal .close { background:none; border:none; font-size:22px; line-height:1; cursor:pointer; color:#555; }
     .modal .actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
-    .close { float:right; font-size:20px; cursor:pointer; line-height:1; }
+    .modal input { width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; }
+
+    /* Small print hints */
+    .hint { font-size:12px; color:#666; margin-top:4px; }
   </style>
 </head>
 <body>
 
 <h2>Karta próby hamulca 🚆</h2>
 
+<!-- Dane ogólne -->
 <div class="panel">
   <h3>Dane ogólne</h3>
-  <label>Miejsce wykonania próby: <input id="miejsce" type="text" autocomplete="off"></label>
-  <label>Data (DD.MM.YYYY): <input id="data" type="text" inputmode="numeric" placeholder="DD.MM.RRRR"></label>
-  <label>Godzina (HH:MM): <input id="godzina" type="text" inputmode="numeric" placeholder="HH:MM"></label>
-  <label>Osoba wystawiająca kartę: <input id="osobaWystawiajaca" type="text" autocomplete="off"></label>
+
+  <label>Miejsce wykonania próby:
+    <input id="miejsce" type="text" autocomplete="off">
+  </label>
+
+  <label>Data (DD.MM.YYYY):
+    <input id="data" type="text" inputmode="numeric" placeholder="DD.MM.RRRR">
+  </label>
+
+  <label>Godzina (HH:MM):
+    <input id="godzina" type="text" inputmode="numeric" placeholder="HH:MM">
+  </label>
+
+  <label>Osoba wystawiająca kartę:
+    <input id="osobaWystawiajaca" type="text" autocomplete="off">
+  </label>
+
   <label>Próbę wykonano z:
     <select id="probaZ">
       <option value="">-- wybierz --</option>
-      <option value="Lokomotywa">Lokomotywa prowadząca</option>
-      <option value="Inna">Inna lokomotywa</option>
-      <option value="Stacjonarne">Urządzenie stacjonarne</option>
+      <option value="Lokomotywa prowadząca">Lokomotywa prowadząca</option>
+      <option value="Inna lokomotywa">Inna lokomotywa</option>
+      <option value="Urządzenie stacjonarne">Urządzenie stacjonarne</option>
     </select>
+    <span id="probaBadge" class="inline-badge" style="display:none;"></span>
   </label>
-  <label>Osoba wykonująca próbę: <input id="osobaProba" type="text" autocomplete="off"></label>
-  <label>Maszynista: <input id="maszynista" type="text" autocomplete="off"></label>
-  <label>Kierownik pociągu: <input id="kierownik" type="text" autocomplete="off"></label>
-  <!-- Numery wagonów na końcu -->
-  <label>Numer pierwszego wagonu: <input id="zaLok1" type="text" autocomplete="off"></label>
-  <label>Numer drugiego wagonu: <input id="zaLok2" type="text" autocomplete="off"></label>
-  <label>Numer przedostatniego wagonu: <input id="koniec1" type="text" autocomplete="off"></label>
-  <label>Numer ostatniego wagonu: <input id="koniec2" type="text" autocomplete="off"></label>
+
+  <label>Osoba wykonująca próbę:
+    <input id="osobaProba" type="text" autocomplete="off">
+  </label>
+
+  <label>Maszynista:
+    <input id="maszynista" type="text" autocomplete="off">
+  </label>
+
+  <label>Kierownik pociągu:
+    <input id="kierownik" type="text" autocomplete="off">
+  </label>
+
+  <!-- WAGONY: na końcu panelu Dane ogólne -->
+  <label>Numer pierwszego wagonu:
+    <input id="zaLok1" type="text" autocomplete="off" placeholder="np. 51 1234-567-8">
+  </label>
+  <label>Numer drugiego wagonu:
+    <input id="zaLok2" type="text" autocomplete="off" placeholder="np. 51 1234-567-8">
+  </label>
+  <label>Numer przedostatniego wagonu:
+    <input id="koniec1" type="text" autocomplete="off" placeholder="np. 51 1234-567-8">
+  </label>
+  <label>Numer ostatniego wagonu:
+    <input id="koniec2" type="text" autocomplete="off" placeholder="np. 51 1234-567-8">
+  </label>
+
+  <!-- Ukryte pola do przechowywania wartości z modali (druk korzysta z nich) -->
+  <input id="lokomotywa" type="hidden">
+  <input id="stanowiskoNr" type="hidden">
 </div>
 
+<!-- Próba hamulca -->
 <div class="panel">
   <h3>Próba hamulca</h3>
-  <label>Masa ogólna składu [t]: <input id="masaSkladu" type="number" step="1" min="0"></label>
-  <label>Masa ogólna pociągu [t]: <input id="masaPociagu" type="number" step="1" min="0"></label>
-  <label>Masa hamująca rzeczywista [t]: <input id="mhr" type="number" step="1" min="0"></label>
-  <label>Procent wymagany [%]: <input id="pw" type="number" step="1" min="0" max="100"></label>
-  <label>Ciśnienie przewodu głównego [MPa]: <input id="cisnienieGl" type="number" step="0.01" min="0"></label>
-  <label>Ciśnienie przewodu dodatkowego [MPa]: <input id="cisnienieDod" type="number" step="0.01" min="0"></label>
+
+  <label>Masa ogólna składu [t]:
+    <input id="masaSkladu" type="number" step="1" min="0" placeholder="np. 450">
+  </label>
+
+  <label>Masa ogólna pociągu [t]:
+    <input id="masaPociagu" type="number" step="1" min="0" placeholder="np. 480">
+  </label>
+
+  <label>Masa hamująca rzeczywista [t]:
+    <input id="mhr" type="number" step="1" min="0" placeholder="np. 300">
+  </label>
+
+  <label>Procent wymagany [%]:
+    <input id="pw" type="number" step="1" min="0" max="100" placeholder="np. 60">
+  </label>
+
+  <label>Ciśnienie przewodu głównego [MPa]:
+    <input id="cisnienieGl" type="number" step="0.01" min="0" placeholder="np. 0.50">
+    <div class="hint">Wskazania referencyjne: 0.50 MPa</div>
+  </label>
+
+  <label>Ciśnienie przewodu dodatkowego [MPa]:
+    <input id="cisnienieDod" type="number" step="0.01" min="0" placeholder="np. 0.80">
+    <div class="hint">Wskazania referencyjne: 0.50 lub 0.80 MPa</div>
+  </label>
+
   <button id="btnOblicz" type="button">Oblicz</button>
 </div>
 
+<!-- Wyniki -->
 <div class="panel">
   <h3>Wyniki</h3>
   <p id="wynik"></p>
@@ -73,43 +140,107 @@
   <button id="drukujBtn" type="button" disabled>Drukuj</button>
 </div>
 
-<!-- Modal: Oznaczenie lokomotywy -->
+<!-- Modal: Lokomotywa -->
 <div id="lokModal" class="modal" aria-hidden="true">
   <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="lokTitle">
-    <span class="close" onclick="closeModal('lokModal')" aria-label="Zamknij">&times;</span>
-    <h3 id="lokTitle">Oznaczenie lokomotywy</h3>
-    <input id="lokomotywa" type="text" autocomplete="off" placeholder="np. EU07-123">
+    <header>
+      <h3 id="lokTitle">Oznaczenie lokomotywy</h3>
+      <button class="close" onclick="closeModal('lokModal')" aria-label="Zamknij">&times;</button>
+    </header>
+    <input id="lokInput" type="text" autocomplete="off" placeholder="np. EU07-123">
     <div class="actions">
-      <button onclick="closeModal('lokModal')">OK</button>
+      <button onclick="confirmLok()">OK</button>
     </div>
   </div>
 </div>
 
-<!-- Modal: Numer stanowiska -->
+<!-- Modal: Stanowisko -->
 <div id="stanModal" class="modal" aria-hidden="true">
   <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="stanTitle">
-    <span class="close" onclick="closeModal('stanModal')" aria-label="Zamknij">&times;</span>
-    <h3 id="stanTitle">Numer stanowiska</h3>
-    <input id="stanowiskoNr" type="text" autocomplete="off" placeholder="np. ST-05">
+    <header>
+      <h3 id="stanTitle">Numer stanowiska</h3>
+      <button class="close" onclick="closeModal('stanModal')" aria-label="Zamknij">&times;</button>
+    </header>
+    <input id="stanInput" type="text" autocomplete="off" placeholder="np. ST-05">
     <div class="actions">
-      <button onclick="closeModal('stanModal')">OK</button>
+      <button onclick="confirmStan()">OK</button>
     </div>
   </div>
 </div>
 
 <script>
-  // Wywołanie modali po wyborze źródła próby
-  document.getElementById("probaZ").addEventListener("change", function() {
-    const v = this.value;
-    if (v === "Lokomotywa" || v === "Inna") openModal('lokModal');
-    else if (v === "Stacjonarne") openModal('stanModal');
+  // Modal helpers
+  function openModal(id) {
+    const el = document.getElementById(id);
+    el.style.display = "block";
+    // focus first input after opening
+    setTimeout(() => {
+      const inp = el.querySelector('input');
+      if (inp) inp.focus();
+    }, 0);
+  }
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    el.style.display = "none";
+  }
+  // Close on backdrop click
+  document.addEventListener('click', (e) => {
+    const modals = ['lokModal','stanModal'];
+    modals.forEach(id => {
+      const m = document.getElementById(id);
+      if (m.style.display === 'block' && e.target === m) closeModal(id);
+    });
   });
-  function openModal(id) { document.getElementById(id).style.display = "block"; }
-  function closeModal(id) { document.getElementById(id).style.display = "none"; }
+  // Close on ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal('lokModal'); closeModal('stanModal');
+    }
+  });
 
+  // Source selection -> open appropriate modal
+  const probaZEl = document.getElementById("probaZ");
+  const badgeEl = document.getElementById("probaBadge");
+  probaZEl.addEventListener("change", function() {
+    const v = this.value;
+    if (v === "Lokomotywa prowadząca" || v === "Inna lokomotywa") {
+      openModal('lokModal');
+    } else if (v === "Urządzenie stacjonarne") {
+      openModal('stanModal');
+    }
+    // reset badge when switching type
+    badgeEl.style.display = 'none';
+    badgeEl.textContent = '';
+    // also clear stored values when changing type
+    if (v === "Urządzenie stacjonarne") {
+      document.getElementById('lokomotywa').value = '';
+    } else {
+      document.getElementById('stanowiskoNr').value = '';
+    }
+  });
+
+  // Confirm modal entries -> store in hidden inputs + show badge
+  function confirmLok() {
+    const val = document.getElementById('lokInput').value.trim();
+    document.getElementById('lokomotywa').value = val;
+    if (val) {
+      badgeEl.textContent = `Lokomotywa: ${val}`;
+      badgeEl.style.display = 'inline-block';
+    }
+    closeModal('lokModal');
+  }
+  function confirmStan() {
+    const val = document.getElementById('stanInput').value.trim();
+    document.getElementById('stanowiskoNr').value = val;
+    if (val) {
+      badgeEl.textContent = `Stanowisko: ${val}`;
+      badgeEl.style.display = 'inline-block';
+    }
+    closeModal('stanModal');
+  }
+
+  // Calculation
   document.getElementById("btnOblicz").addEventListener("click", oblicz);
-  document.getElementById("drukujBtn").addEventListener("click", drukuj);
-
   function oblicz() {
     const masaSkladu = parseFloat(document.getElementById("masaSkladu").value);
     const masaPociagu = parseFloat(document.getElementById("masaPociagu").value);
@@ -139,6 +270,8 @@
     document.getElementById("drukujBtn").disabled = false;
   }
 
+  // Print
+  document.getElementById("drukujBtn").addEventListener("click", drukuj);
   function drukuj() {
     const now = new Date();
     const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}<br>Wygenerowano z systemu ESKA by klawinsky & Copilot`;
@@ -159,12 +292,16 @@
             <tr><th>Data</th><td>${get("data")}</td></tr>
             <tr><th>Godzina</th><td>${get("godzina")}</td></tr>
             <tr><th>Osoba wystawiająca</th><td>${get("osobaWystawiajaca")}</td></tr>
+
             <tr class="section-title"><td colspan="2">Dane próby</td></tr>
             <tr><th>Próbę wykonano z</th><td>${get("probaZ")}</td></tr>
             <tr><th>Oznaczenie lokomotywy</th><td>${get("lokomotywa")}</td></tr>
             <tr><th>Numer stanowiska</th><td>${get("stanowiskoNr")}</td></tr>
+
+            <tr class="section-title"><td colspan="2">Wagony</td></tr>
             <tr><th>Numery wagonów za lokomotywą</th><td>${get("zaLok1")}, ${get("zaLok2")}</td></tr>
             <tr><th>Numery wagonów na końcu składu</th><td>${get("koniec1")}, ${get("koniec2")}</td></tr>
+
             <tr class="section-title"><td colspan="2">Parametry i wyniki</td></tr>
             <tr><th>Masa ogólna składu</th><td>${get("masaSkladu")} t</td></tr>
             <tr><th>Masa ogólna pociągu</th><td>${get("masaPociagu")} t</td></tr>
@@ -173,6 +310,7 @@
             <tr><th>Obliczenia (Mo, Mhw, Pr)</th><td>${wynik}</td></tr>
             <tr><th>Ciśnienie przewodu głównego</th><td>${get("cisnienieGl")} MPa</td></tr>
             <tr><th>Ciśnienie przewodu dodatkowego</th><td>${get("cisnienieDod")} MPa</td></tr>
+
             <tr class="section-title"><td colspan="2">Podpisy pracowników</td></tr>
             <tr><th>Osoba wykonująca próbę</th><td class="signature-line">${get("osobaProba")}</td></tr>
             <tr><th>Maszynista</th><td class="signature-line">${get("maszynista")}</td></tr>
@@ -191,7 +329,7 @@
     w.print();
   }
 
-  // Rejestracja service workera (opcjonalnie)
+  // Optional: service worker registration for offline/PWA
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW registration failed:', err));
