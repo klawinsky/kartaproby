@@ -24,7 +24,7 @@
 <h2>Karta próby hamulca 🚆</h2>
 
 <div class="panel">
-  <h3>Panel 1 – Dane ogólne</h3>
+  <h3>Dane ogólne</h3>
   <label>Miejsce wykonania próby: <input id="miejsce" type="text"></label>
   <label>Data (DD.MM.YYYY): <input id="data" type="text"></label>
   <label>Godzina (HH:MM): <input id="godzina" type="text"></label>
@@ -42,12 +42,10 @@
   <label>Osoba wykonująca próbę: <input id="osobaProba" type="text"></label>
   <label>Maszynista: <input id="maszynista" type="text"></label>
   <label>Kierownik pociągu: <input id="kierownik" type="text"></label>
-  <label>Ilość wagonów: <input id="wagony" type="number"></label>
-  <label>Długość pociągu [m]: <input id="dlugosc" type="number"></label>
 </div>
 
 <div class="panel">
-  <h3>Panel 2 – Próba hamulca</h3>
+  <h3>Próba hamulca</h3>
   <label>Masa ogólna składu [t]: <input id="masaSkladu" type="number"></label>
   <label>Masa ogólna pociągu [t]: <input id="masaPociagu" type="number"></label>
   <label>Masa hamująca rzeczywista [t]: <input id="mhr" type="number"></label>
@@ -103,6 +101,7 @@ function oblicz() {
   if (cisDod !== 0.5 && cisDod !== 0.8) komunikat += "<span class='error'>Sprawdź dopuszczalne odchylenia przewodu dodatkowego!</span><br>";
 
   document.getElementById("komunikat").innerHTML = komunikat;
+  document.getElementById("drukujBtn").disabled = true;
   document.getElementById("drukujBtn").disabled = false;
 }
 
@@ -111,15 +110,29 @@ function drukuj() {
   const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}<br>
   Wygenerowano z systemu ESKA by klawinsky & Copilot`;
 
-  // Pobieranie danych
-  const miejsce = document.getElementById("miejsce").value || "-";
-  const data = document.getElementById("data").value || "-";
-  const godzina = document.getElementById("godzina").value || "-";
-  const osobaWystawiajaca = document.getElementById("osobaWystawiajaca").value || "-";
-  const probaZ = document.getElementById("probaZ").value || "-";
-  const lokomotywa = document.getElementById("lokomotywa")?.value || "-";
-  const stanowiskoNr = document.getElementById("stanowiskoNr")?.value || "-";
-  const masaSkladu = document.getElementById("masaSkladu").value || "-";
-  const masaPociagu = document.getElementById("masaPociagu").value || "-";
-  const mhr = document.getElementById("mhr").value || "-";
-  const pw
+  const get = id => document.getElementById(id)?.value || "-";
+
+  const miejsce = get("miejsce");
+  const data = get("data");
+  const godzina = get("godzina");
+  const osobaWystawiajaca = get("osobaWystawiajaca");
+  const probaZ = get("probaZ");
+  const lokomotywa = get("lokomotywa");
+  const stanowiskoNr = get("stanowiskoNr");
+  const masaSkladu = get("masaSkladu");
+  const masaPociagu = get("masaPociagu");
+  const mhr = get("mhr");
+  const pw = get("pw");
+  const cisGl = get("cisnienieGl");
+  const cisDod = get("cisnienieDod");
+  const osobaProba = get("osobaProba");
+  const maszynista = get("maszynista");
+  const kierownik = get("kierownik");
+
+  const wynik = document.getElementById("wynik").innerHTML || "-";
+
+  const printWindow = window.open("", "_blank");
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>
