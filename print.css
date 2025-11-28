@@ -1,4 +1,4 @@
-/* Profesjonalny styl wydruku dla Elektronicznej Karty Próby Hamulca */
+/* print.css - profesjonalny styl wydruku z obramowaniami */
 
 @media print {
   html, body {
@@ -23,11 +23,12 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* stała szerokość kolumn dla czytelności */
+    table-layout: fixed;
+    border: 1px solid #000; /* zewnętrzne obramowanie tabeli */
   }
 
   th, td {
-    border: 1px solid #000;
+    border: 1px solid #000; /* WYRAŹNE obramowanie komórek */
     padding: 6px 8px;
     vertical-align: top;
     word-wrap: break-word;
@@ -35,12 +36,11 @@
 
   th {
     background: #f2f2f2;
-    width: 38%; /* etykieta */
+    width: 38%;
     font-weight: bold;
     text-align: left;
   }
 
-  /* Nagłówki sekcji jako pełne wiersze z ciemniejszym tłem */
   .section-title td {
     background: #ddd;
     font-weight: bold;
@@ -49,7 +49,6 @@
     border: 1px solid #000;
   }
 
-  /* Linie na podpisy */
   .signature-line {
     height: 28px;
     border-bottom: 1px dotted #000;
@@ -62,8 +61,19 @@
     color: #444;
   }
 
-  /* Estetyka stron */
   @page {
     margin: 12mm;
+  }
+}
+
+/* Dodatkowo: styl dla podglądu na ekranie (opcjonalne) */
+@media screen {
+  table.print-preview {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  table.print-preview th, table.print-preview td {
+    border: 1px solid #ccc;
+    padding: 6px 8px;
   }
 }
