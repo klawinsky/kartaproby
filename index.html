@@ -8,6 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
   <style>
+    /* App layout (first-version style) */
     body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; color: #222; }
     h2 { text-align: center; margin-bottom: 20px; }
     .panel { background: #fff; padding: 15px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 6px; }
@@ -29,9 +30,10 @@
     .modal .close { background:none; border:none; font-size:22px; line-height:1; cursor:pointer; color:#555; }
     .modal .actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
     .modal input { width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; }
+    .open-modal-btn { background:#005a9e; margin-left:0; }
 
-    /* Action buttons for modals */
-    .open-modal-btn { margin-left:0; background:#005a9e; }
+    /* Signature guide (used in print via class name) */
+    .signature-line { border-bottom: 1px dotted transparent; }
   </style>
 </head>
 <body>
@@ -101,7 +103,7 @@
     <input id="koniec2" type="text" autocomplete="off" placeholder="np. 51 1234-567-8">
   </label>
 
-  <!-- Ukryte pola na wartości z modali -->
+  <!-- Ukryte pola na wartości z modali (druk korzysta z nich) -->
   <input id="lokomotywa" type="hidden">
   <input id="stanowiskoNr" type="hidden">
 </div>
@@ -176,11 +178,10 @@
 </div>
 
 <script>
-  // Train number validation: only digits, max 6
+  // Numer pociągu: tylko cyfry, max 6
   const nrPociaguEl = document.getElementById('nrPociagu');
   nrPociaguEl.addEventListener('input', () => {
-    // strip non-digits and cap length
-    nrPociaguEl.value = nrPociaguEl.value.replace(/\\D/g, '').slice(0, 6);
+    nrPociaguEl.value = nrPociaguEl.value.replace(/\D/g, '').slice(0, 6);
   });
 
   // Modal helpers
@@ -190,26 +191,29 @@
     setTimeout(() => { const inp = el.querySelector('input'); if (inp) inp.focus(); }, 0);
   }
   function closeModal(id) { document.getElementById(id).style.display = "none"; }
+  // Zamknięcie po kliknięciu tła
   document.addEventListener('click', (e) => {
     ['lokModal','stanModal'].forEach(id => {
       const m = document.getElementById(id);
       if (m.style.display === 'block' && e.target === m) closeModal(id);
     });
   });
+  // Zamknięcie ESC
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal('lokModal'); closeModal('stanModal'); }});
 
-  // Selection -> open modal + show action buttons
-  const probaZEl = document.getElementById("probaZ");
-  const badgeEl = document.getElementById("probaBadge");
-  const openLokBtn = document.getElementById("openLokBtn");
+  // Elementy sterujące modalami
+  const probaZEl    = document.getElementById("probaZ");
+  const badgeEl     = document.getElementById("probaBadge");
+  const openLokBtn  = document.getElementById("openLokBtn");
   const openStanBtn = document.getElementById("openStanBtn");
 
   openLokBtn.addEventListener('click', () => openModal('lokModal'));
   openStanBtn.addEventListener('click', () => openModal('stanModal'));
 
+  // Zmiana źródła próby -> pokaż odpowiedni przycisk + auto otwórz modal
   probaZEl.addEventListener("change", function() {
     const v = this.value;
-    // reset stored values and buttons
+    // reset
     badgeEl.style.display = 'none'; badgeEl.textContent = '';
     document.getElementById('lokomotywa').value = '';
     document.getElementById('stanowiskoNr').value = '';
@@ -225,7 +229,7 @@
     }
   });
 
-  // Confirm modal entries -> store hidden + show badge
+  // Potwierdzenia z modali -> zapis i badge
   function confirmLok() {
     const val = document.getElementById('lokInput').value.trim();
     document.getElementById('lokomotywa').value = val;
@@ -239,7 +243,7 @@
     closeModal('stanModal');
   }
 
-  // Calculation
+  // Obliczenia
   document.getElementById("btnOblicz").addEventListener("click", oblicz);
   function oblicz() {
     const masaSkladu = parseFloat(document.getElementById("masaSkladu").value);
@@ -249,9 +253,9 @@
     const cisGl = parseFloat(document.getElementById("cisnienieGl").value);
     const cisDod = parseFloat(document.getElementById("cisnienieDod").value);
 
-    // Train number must be 1-6 digits
+    // Walidacja numeru pociągu
     const nrP = nrPociaguEl.value;
-    if (!nrP || !/^\\d{1,6}$/.test(nrP)) {
+    if (!nrP || !/^\d{1,6}$/.test(nrP)) {
       document.getElementById("komunikat").innerHTML = "<span class='error'>Podaj poprawny numer pociągu (1–6 cyfr).</span>";
       return;
     }
@@ -277,70 +281,62 @@
     document.getElementById("drukujBtn").disabled = false;
   }
 
-  // Print
+  // Drukowanie (profesjonalna tabela)
   document.getElementById("drukujBtn").addEventListener("click", drukuj);
   function drukuj() {
-  const now = new Date();
-  const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}<br>Wygenerowano z systemu ESKA by klawinsky & Copilot`;
+    const now = new Date();
+    const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}<br>Wygenerowano z systemu ESKA by klawinsky & Copilot`;
 
-  const get = id => document.getElementById(id)?.value || "-";
-  const probaZEl = document.getElementById("probaZ");
-  const probaZTxt = probaZEl?.options[probaZEl.selectedIndex]?.text || "-";
-  const wynik = document.getElementById("wynik").innerHTML || "-";
+    const get = id => document.getElementById(id)?.value || "-";
+    const probaZEl = document.getElementById("probaZ");
+    const probaZTxt = probaZEl?.options[probaZEl.selectedIndex]?.text || "-";
+    const wynik = document.getElementById("wynik").innerHTML || "-";
 
-  const html = `
-    <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>Karta próby hamulca</title>
-        <link rel="stylesheet" href="print.css">
-      </head>
-      <body>
-        <h2>Elektroniczna Karta Próby Hamulca</h2>
+    const html = `
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Karta próby hamulca</title>
+          <link rel="stylesheet" href="print.css">
+        </head>
+        <body>
+          <h2>Elektroniczna Karta Próby Hamulca</h2>
 
-        <table>
-          <tr><th>Miejsce wykonania próby</th><td>${get("miejsce")}</td></tr>
-          <tr><th>Numer pociągu</th><td>${get("nrPociagu")}</td></tr>
-          <tr><th>Data</th><td>${get("data")}</td></tr>
-          <tr><th>Godzina</th><td>${get("godzina")}</td></tr>
-          <tr><th>Osoba wystawiająca</th><td>${get("osobaWystawiajaca")}</td></tr>
+          <table>
+            <tr><th>Miejsce wykonania próby</th><td>${get("miejsce")}</td></tr>
+            <tr><th>Numer pociągu</th><td>${get("nrPociagu")}</td></tr>
+            <tr><th>Data</th><td>${get("data")}</td></tr>
+            <tr><th>Godzina</th><td>${get("godzina")}</td></tr>
+            <tr><th>Osoba wystawiająca</th><td>${get("osobaWystawiajaca")}</td></tr>
 
-          <tr class="section-title"><td colspan="2">Dane próby</td></tr>
-          <tr><th>Próbę wykonano z</th><td>${probaZTxt}</td></tr>
-          <tr><th>Oznaczenie lokomotywy</th><td>${get("lokomotywa")}</td></tr>
-          <tr><th>Numer stanowiska</th><td>${get("stanowiskoNr")}</td></tr>
+            <tr class="section-title"><td colspan="2">Dane próby</td></tr>
+            <tr><th>Próbę wykonano z</th><td>${probaZTxt}</td></tr>
+            <tr><th>Oznaczenie lokomotywy</th><td>${get("lokomotywa")}</td></tr>
+            <tr><th>Numer stanowiska</th><td>${get("stanowiskoNr")}</td></tr>
 
-          <tr class="section-title"><td colspan="2">Wagony</td></tr>
-          <tr><th>Numery wagonów za lokomotywą</th><td>${get("zaLok1")}, ${get("zaLok2")}</td></tr>
-          <tr><th>Numery wagonów na końcu składu</th><td>${get("koniec1")}, ${get("koniec2")}</td></tr>
+            <tr class="section-title"><td colspan="2">Wagony</td></tr>
+            <tr><th>Numery wagonów za lokomotywą</th><td>${get("zaLok1")}, ${get("zaLok2")}</td></tr>
+            <tr><th>Numery wagonów na końcu składu</th><td>${get("koniec1")}, ${get("koniec2")}</td></tr>
 
-          <tr class="section-title"><td colspan="2">Parametry i wyniki</td></tr>
-          <tr><th>Masa ogólna składu</th><td>${get("masaSkladu")} t</td></tr>
-          <tr><th>Masa ogólna pociągu</th><td>${get("masaPociagu")} t</td></tr>
-          <tr><th>Masa hamująca rzeczywista</th><td>${get("mhr")} t</td></tr>
-          <tr><th>Procent wymagany</th><td>${get("pw")}%</td></tr>
-          <tr><th>Obliczenia (Mo, Mhw, Pr)</th><td>${wynik}</td></tr>
-          <tr><th>Ciśnienie przewodu głównego</th><td>${get("cisnienieGl")} MPa</td></tr>
-          <tr><th>Ciśnienie przewodu dodatkowego</th><td>${get("cisnienieDod")} MPa</td></tr>
+            <tr class="section-title"><td colspan="2">Parametry i wyniki</td></tr>
+            <tr><th>Masa ogólna składu</th><td>${get("masaSkladu")} t</td></tr>
+            <tr><th>Masa ogólna pociągu</th><td>${get("masaPociagu")} t</td></tr>
+            <tr><th>Masa hamująca rzeczywista</th><td>${get("mhr")} t</td></tr>
+            <tr><th>Procent wymagany</th><td>${get("pw")}%</td></tr>
+            <tr><th>Obliczenia (Mo, Mhw, Pr)</th><td>${wynik}</td></tr>
+            <tr><th>Ciśnienie przewodu głównego</th><td>${get("cisnienieGl")} MPa</td></tr>
+            <tr><th>Ciśnienie przewodu dodatkowego</th><td>${get("cisnienieDod")} MPa</td></tr>
 
-          <tr class="section-title"><td colspan="2">Podpisy pracowników</td></tr>
-          <tr><th>Osoba wykonująca próbę</th><td class="signature-line">${get("osobaProba")}</td></tr>
-          <tr><th>Maszynista</th><td class="signature-line">${get("maszynista")}</td></tr>
-          <tr><th>Kierownik pociągu</th><td class="signature-line">${get("kierownik")}</td></tr>
-        </table>
+            <tr class="section-title"><td colspan="2">Podpisy pracowników</td></tr>
+            <tr><th>Osoba wykonująca próbę</th><td class="signature-line">${get("osobaProba")}</td></tr>
+            <tr><th>Maszynista</th><td class="signature-line">${get("maszynista")}</td></tr>
+            <tr><th>Kierownik pociągu</th><td class="signature-line">${get("kierownik")}</td></tr>
+          </table>
 
-        <footer>${footer}</footer>
-      </body>
-    </html>
-  `;
-
-  const w = window.open("", "_blank");
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  w.print();
-}
+          <footer>${footer}</footer>
+        </body>
+      </html>
+    `;
 
     const w = window.open("", "_blank");
     w.document.open();
