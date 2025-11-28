@@ -1,64 +1,69 @@
-/* Styl wydruku dla Elektronicznej Karty Próby Hamulca – klasyczny formularz z liniami na podpisy */
+/* Profesjonalny styl wydruku dla Elektronicznej Karty Próby Hamulca */
 
 @media print {
+  html, body {
+    background: #fff;
+  }
+
   body {
     font-family: "Arial", sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     color: #000;
-    margin: 15mm;
-    background: #fff;
+    margin: 12mm;
   }
 
   h2 {
     text-align: center;
-    font-size: 20px;
-    margin-bottom: 10mm;
+    font-size: 18px;
+    margin: 0 0 8mm 0;
     text-transform: uppercase;
-    border-bottom: 2px solid #000;
-    padding-bottom: 5mm;
+    letter-spacing: 0.5px;
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 12mm;
+    table-layout: fixed; /* stała szerokość kolumn dla czytelności */
   }
 
   th, td {
     border: 1px solid #000;
-    padding: 6px 10px;
-    text-align: left;
+    padding: 6px 8px;
     vertical-align: top;
+    word-wrap: break-word;
   }
 
   th {
-    background: #f0f0f0;
+    background: #f2f2f2;
+    width: 38%; /* etykieta */
     font-weight: bold;
-    width: 35%;
+    text-align: left;
   }
 
-  .section-title {
+  /* Nagłówki sekcji jako pełne wiersze z ciemniejszym tłem */
+  .section-title td {
     background: #ddd;
     font-weight: bold;
     text-align: center;
-    font-size: 14px;
+    padding: 8px;
+    border: 1px solid #000;
   }
 
   /* Linie na podpisy */
   .signature-line {
-    height: 30px;
+    height: 28px;
     border-bottom: 1px dotted #000;
   }
 
   footer {
+    margin-top: 8mm;
     text-align: center;
     font-size: 11px;
-    color: #555;
-    margin-top: 20mm;
+    color: #444;
   }
 
-  /* Dodatkowe poprawki dla czytelności */
+  /* Estetyka stron */
   @page {
-    margin: 15mm;
+    margin: 12mm;
   }
 }
