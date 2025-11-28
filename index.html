@@ -54,22 +54,6 @@
   <label>Procent wymagany [%]: <input id="pw" type="number"></label>
   <label>Ciśnienie przewodu głównego [MPa]: <input id="cisnienieGl" type="number" step="0.01"></label>
   <label>Ciśnienie przewodu dodatkowego [MPa]: <input id="cisnienieDod" type="number" step="0.01"></label>
-  <label>Hamulec elektrodynamiczny: <select id="hamED"><option>TAK</option><option>NIE</option></select></label>
-  <label>Układ sterowania EP: <select id="hamEP"><option>TAK</option><option>NIE</option></select></label>
-  <label>Układ zamykania drzwi: <select id="drzwi"><option>TAK</option><option>NIE</option></select></label>
-  <label>Inne urządzenia: <select id="inne"><option>TAK</option><option>NIE</option></select></label>
-  <label>Numery pojazdów za lokomotywą:
-    <input id="zaLok1" type="text" placeholder="XX-XX-XXXX-XXX-X">
-    <input id="zaLok2" type="text" placeholder="XX-XX-XXXX-XXX-X">
-  </label>
-  <label>Numery pojazdów na końcu składu:
-    <input id="koniec1" type="text" placeholder="XX-XX-XXXX-XXX-X">
-    <input id="koniec2" type="text" placeholder="XX-XX-XXXX-XXX-X">
-  </label>
-  <label>Czy na końcu składu wagon z nieczynnym hamulcem?
-    <select id="wagonNieczynny"><option>NIE</option><option>TAK</option></select>
-  </label>
-  <label id="wagonNrLabel" style="display:none;">Numer wagonu: <input id="wagonNr" type="text" placeholder="XX-XX-XXXX-XXX-X"></label>
   <button id="btnOblicz" type="button">Oblicz</button>
 </div>
 
@@ -85,37 +69,60 @@ document.getElementById("probaZ").addEventListener("change", function() {
   document.getElementById("oznaczenieLok").style.display = (this.value === "lokProw" || this.value === "lokInna") ? "block" : "none";
   document.getElementById("stanowisko").style.display = (this.value === "stacjonarne") ? "block" : "none";
 });
-document.getElementById("wagonNieczynny").addEventListener("change", function() {
-  document.getElementById("wagonNrLabel").style.display = (this.value === "TAK") ? "block" : "none";
-});
 
 document.getElementById("btnOblicz").addEventListener("click", oblicz);
 document.getElementById("drukujBtn").addEventListener("click", drukuj);
 
 function oblicz() {
-  let masaSkladu = parseFloat(document.getElementById("masaSkladu").value);
-  let masaPociagu = parseFloat(document.getElementById("masaPociagu").value);
-  let mhr = parseFloat(document.getElementById("mhr").value);
-  let pw = parseFloat(document.getElementById("pw").value);
-  let cisGl = parseFloat(document.getElementById("cisnienieGl").value);
-  let cisDod = parseFloat(document.getElementById("cisnienieDod").value);
+  const masaSkladu = parseFloat(document.getElementById("masaSkladu").value);
+  const masaPociagu = parseFloat(document.getElementById("masaPociagu").value);
+  const mhr = parseFloat(document.getElementById("mhr").value);
+  const pw = parseFloat(document.getElementById("pw").value);
+  const cisGl = parseFloat(document.getElementById("cisnienieGl").value);
+  const cisDod = parseFloat(document.getElementById("cisnienieDod").value);
 
-  // wybór Mo zgodnie z zasadą
-  let Mo = (masaSkladu >= 200) ? masaSkladu : masaPociagu;
+  if (isNaN(masaSkladu) || isNaN(masaPociagu) || isNaN(mhr) || isNaN(pw)) {
+    document.getElementById("komunikat").innerHTML = "<span class='error'>Uzupełnij wszystkie pola!</span>";
+    return;
+  }
 
-  let Mhw = Math.ceil((Mo * pw) / 100);
-  let Pr = Math.floor((mhr * 100) / Mo);
+  const Mo = (masaSkladu >= 200) ? masaSkladu : masaPociagu;
+  const Mhw = Math.ceil((Mo * pw) / 100);
+  const Pr = Math.floor((mhr * 100) / Mo);
 
-  let wynikTxt = `Masa ogólna (Mo): ${Mo} t<br>
-                  Masa hamująca wymagana: ${Mhw} t<br>
-                  Procent rzeczywisty: ${Pr}%`;
-
+  let wynikTxt = `Mo: ${Mo} t<br>Mhw: ${Mhw} t<br>Pr: ${Pr}%`;
   document.getElementById("wynik").innerHTML = wynikTxt;
 
   let komunikat = "";
   if (Pr < pw) {
-    komunikat += "<span class='error'>Dodaj wagony lub zmniejsz prędkość pociągu zgodnie z tabelami!</span><br>";
+    komunikat += "<span class='error'>Dodaj wagony lub zmniejsz prędkość!</span><br>";
   } else {
     komunikat += "<span class='success'>Warunki spełnione ✅</span><br>";
   }
-  if (cisGl !== 0.5) komunikat
+  if (cisGl !== 0.5) komunikat += "<span class='error'>Sprawdź dopuszczalne odchylenia przewodu głównego!</span><br>";
+  if (cisDod !== 0.5 && cisDod !== 0.8) komunikat += "<span class='error'>Sprawdź dopuszczalne odchylenia przewodu dodatkowego!</span><br>";
+
+  document.getElementById("komunikat").innerHTML = komunikat;
+  document.getElementById("drukujBtn").disabled = false;
+}
+
+function drukuj() {
+  const now = new Date();
+  const footer = `Wygenerowano: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+  const content = document.getElementById("wynik").innerHTML + "<br>" + document.getElementById("komunikat").innerHTML + "<hr>" + footer;
+  const printWindow = window.open("", "_blank");
+  printWindow.document.write("<html><head><title>Karta próby hamulca</title></head><body>" + content + "</body></html>");
+  printWindow.document.close();
+  printWindow.print();
+}
+
+// Rejestracja service workera
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .catch(err => console.error('SW registration failed:', err));
+  });
+}
+</script>
+</body>
+</html>

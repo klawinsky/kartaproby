@@ -1,0 +1,10 @@
+{
+  "name": "Karta próby hamulca",
+  "short_name": "Próba hamulca",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007acc",
+  "description": "Aplikacja mobilna do generowania i drukowania kart próby hamulca.",
+  "icons
