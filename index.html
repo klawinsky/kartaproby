@@ -31,6 +31,11 @@
   <label>Osoba wykonująca próbę: <input id="osobaProba"></label>
   <label>Maszynista: <input id="maszynista"></label>
   <label>Kierownik pociągu: <input id="kierownik"></label>
+  <!-- nowe pola na wagony -->
+  <label>Numer pierwszego wagonu: <input id="zaLok1"></label>
+  <label>Numer drugiego wagonu: <input id="zaLok2"></label>
+  <label>Numer przedostatniego wagonu: <input id="koniec1"></label>
+  <label>Numer ostatniego wagonu: <input id="koniec2"></label>
 </div>
 
 <div>
@@ -112,26 +117,7 @@ function drukuj() {
           <tr><th>Obliczenia</th><td>${wynik}</td></tr>
           <tr><th>Ciśnienie przewodu głównego</th><td>${get("cisnienieGl")} MPa</td></tr>
           <tr><th>Ciśnienie przewodu dodatkowego</th><td>${get("cisnienieDod")} MPa</td></tr>
+          <tr><th>Pojazdy za lokomotywą</th><td>${get("zaLok1")}, ${get("zaLok2")}</td></tr>
+          <tr><th>Pojazdy na końcu składu</th><td>${get("koniec1")}, ${get("koniec2")}</td></tr>
           <tr class="section-title"><td colspan="2">Podpisy pracowników</td></tr>
-          <tr><th>Osoba wykonująca próbę</th><td class="signature-line">${get("osobaProba")}</td></tr>
-          <tr><th>Maszynista</th><td class="signature-line">${get("maszynista")}</td></tr>
-          <tr><th>Kierownik pociągu</th><td class="signature-line">${get("kierownik")}</td></tr>
-        </table>
-        <footer>${footer}</footer>
-      </body>
-    </html>
-  `);
-  printWindow.document.close();
-  printWindow.print();
-}
-
-// Rejestracja service workera
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW registration failed:', err));
-  });
-}
-</script>
-
-</body>
-</html>
+          <tr><th>Osoba wykonująca próbę</th><td class="signature-line">${get("osobaProba")}</td></tr
